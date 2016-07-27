@@ -1,0 +1,13 @@
+{
+	"name": "manta-mdu",
+	"version": "1.0.0",
+	"description": "prototype \"mdu\" implementation for Manta",
+	"dependencies": {
+		"jsprim": "^1.3.0",
+		"lstream": "^0.0.4",
+		"strsplit": "^1.0.0",
+		"vstream": "^0.1.0"
+	},
+	"author": "Dave Pacheco <dap@joyent.com>",
+	"license": "MIT"
+}
