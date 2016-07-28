@@ -18,7 +18,7 @@ function main
 
 	echo -n "Creating job ... " >&2
 	jobid="$(mjob create \
-	    --map='find $MANTA_INPUT_FILE -type f -printf "%s %k %p\n"' \
+	    --map='find "$MANTA_INPUT_FILE" -type f -printf "%s %k %p\n"' \
 	    --asset="$mdu_asset" --init="tar xzf /assets$mdu_asset" \
 	    --reduce='node /asset/bin/mdu-reduce.js')" || fail "failed"
 	echo "$jobid" >&2
