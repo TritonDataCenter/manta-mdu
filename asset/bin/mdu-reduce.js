@@ -16,6 +16,7 @@
  * "ino" property?)
  */
 
+var mod_cmdutil = require('cmdutil');
 var mod_lstream = require('lstream');
 var mod_jsprim = require('jsprim');
 var mod_path = require('path');
@@ -23,80 +24,33 @@ var mod_strsplit = require('strsplit');
 var mod_stream = require('stream');
 var mod_util = require('util');
 var mod_vstream = require('vstream');
+var mod_mdu = require('../lib/common');
 
 function main()
 {
 	var lstream, parser, ncdu;
 
 	lstream = new mod_lstream();
-	parser = new MduParserStream();
+	parser = new mod_mdu.MduParserStream();
 	ncdu = new MduNcduStream();
 
 	process.stdin.pipe(lstream);
 	lstream.pipe(parser);
 	parser.pipe(ncdu);
 	ncdu.pipe(process.stdout);
-}
 
-/*
- * This stream transforms lines of input (specified above) into objects with
- * properties:
- *
- *     mduPath		path to the Manta object
- *
- *     mduSizeLogical	logical size of the Manta object (in bytes)
- *
- *     mduSizePhysical	physical size of the Manta object (in bytes)
- */
-function MduParserStream(uoptions)
-{
-	var options = mod_jsprim.mergeObjects(
-	    uoptions ? uoptions.streamOptions : undefined,
-	    { 'objectMode': true }, { 'highWaterMark': 0 });
-	mod_stream.Transform.call(this, options);
-	mod_vstream.wrapTransform(this);
-}
+	parser.on('error', mod_cmdutil.fail);
+	ncdu.on('error', mod_cmdutil.fail);
 
-mod_util.inherits(MduParserStream, mod_stream.Transform);
+	process.on('exit', function (code) {
+		if (code !== 0) {
+			return;
+		}
 
-MduParserStream.prototype._transform = function (line, _, callback)
-{
-	var parts, szlog, szphys, objname;
-
-	parts = mod_strsplit(line, ' ', 3);
-	if (parts.length !== 3) {
-		this.vsWarn(new Error('bad format (wrong number of parts)'),
-		    'nerr_badparts');
-		setImmediate(callback);
-		return;
-	}
-
-	szlog = parseInt(parts[0], 10);
-	szphys = parseInt(parts[1], 10);
-	if (isNaN(szlog) || szlog < 0 || isNaN(szphys) || szphys < 0) {
-		this.vsWarn(new Error(
-		    'bad format (bad logical or physical size)'),
-		    'nerr_badsize');
-		setImmediate(callback);
-		return;
-	}
-
-	if (!mod_jsprim.startsWith(parts[2], '/manta')) {
-		this.vsWarn(new Error('bad format (unexpected path prefix)'),
-		    'nerr_badprefix');
-		setImmediate(callback);
-		return;
-	}
-
-	objname = parts[2].substr('/manta'.length);
-	this.push({
-	    'mduDirname': mod_path.dirname(objname),
-	    'mduPath': objname,
-	    'mduSizeLogical': szlog,
-	    'mduSizePhysical': szphys * 1024
+		parser.vsDumpDebug(process.stderr);
+		ncdu.vsDumpDebug(process.stderr);
 	});
-	setImmediate(callback);
-};
+}
 
 /*
  * This stream takes the output of the MduParserStream and produces the
@@ -228,7 +182,7 @@ MduNcduStream.prototype.emitTree = function (node, name)
 		 * This is a directory.
 		 */
 		this.push('[ ' + JSON.stringify({ 'name': name }));
-		children = Object.keys(node);
+		children = Object.keys(node).sort();
 		children.forEach(function (c) {
 			self.push(',');
 			self.emitTree(node[c], c);

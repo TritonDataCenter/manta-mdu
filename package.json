@@ -3,6 +3,8 @@
 	"version": "1.0.0",
 	"description": "prototype \"mdu\" implementation for Manta",
 	"dependencies": {
+		"assert-plus": "^1.0.0",
+		"cmdutil": "^1.1.0",
 		"jsprim": "^1.3.0",
 		"lstream": "^0.0.4",
 		"strsplit": "^1.0.0",
