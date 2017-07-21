@@ -35,3 +35,13 @@ to work out a bunch of details:
   users.  It should probably look at logical usage by default (which is much
   easier).
 - Add tests.
+
+
+## Related tools
+
+It's possible to generate an ncdu file for an entire Manta deployment all at
+once from Manta's own regular backups.  See [dump\_based](dump_based) for
+details.
+
+[manta-physusage](https://github.com/joyent/manta-physusage) provides some tools
+that summarize usage on a per-CN and per-account basis.
