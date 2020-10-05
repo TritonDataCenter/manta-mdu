@@ -36,12 +36,16 @@ MduParserStream.prototype._transform = function (line, _, callback)
 {
 	var dirent = JSON.parse(line);
 
-	this.push({
-	    'mduDirname': dirent.parent,
-	    'mduPath': dirent.name,
-	    'mduSizeLogical': dirent.size,
-	    'mduSizePhysical': dirent.size
-	});
+	// Don't emit "directory" entries because the downstream `MduNcduStream`
+	// does not handle them properly.
+	if (dirent.type === 'object') {
+		this.push({
+		    'mduDirname': dirent.parent,
+		    'mduPath': dirent.name,
+		    'mduSizeLogical': dirent.size,
+		    'mduSizePhysical': dirent.size
+		});
+	}
 	setImmediate(callback);
 };
 

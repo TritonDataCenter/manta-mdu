@@ -107,7 +107,7 @@ MduNcduStream.prototype._transform = function (metadata, _, callback)
 
 		if (!mod_jsprim.hasKey(node, parts[i])) {
 			node[parts[i]] = {};
-		} else if (mod_jsprim.hasKey(node[parts[i]], 'mduDirname')) {
+		} else if (mod_jsprim.hasKey(node[parts[i]], 'mduSizeLogical')) {
 			this.vsWarn(new Error(
 			    'input contains directory and object with same ' +
 			    'name'), 'nerr_conflict');
@@ -169,7 +169,7 @@ MduNcduStream.prototype.emitTree = function (node, name)
 	var self = this;
 	var children;
 
-	if (mod_jsprim.hasKey(node, 'mduDirname')) {
+	if (mod_jsprim.hasKey(node, 'mduSizeLogical')) {
 		/*
 		 * This is an object.
 		 */
