@@ -47,8 +47,9 @@ function main()
 			return;
 		}
 
-		parser.vsDumpDebug(process.stderr);
-		ncdu.vsDumpDebug(process.stderr);
+		// Note(trent): Turn off stderr noise for bin/mfind2ncdu usage.
+		//parser.vsDumpDebug(process.stderr);
+		//ncdu.vsDumpDebug(process.stderr);
 	});
 }
 

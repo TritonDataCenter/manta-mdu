@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#
+# Convert `mfind -j $MANTA_DIR` output to the format used by `ncdu`.
+#
+# Usage:
+#       mfind -f $MANTA_DIR | ./bin/mfind2ncdu > foo.ncdu
+#       ncdu -f foo.ncdu
+#
+
+if [[ -n "$TRACE" ]]; then
+    export PS4='[\D{%FT%TZ}] ${BASH_SOURCE}:${LINENO}: ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+    set -o xtrace
+fi
+set -o errexit
+set -o pipefail
+
+
+TOP=$(cd $(dirname $0)/../; pwd)
+
+node asset/bin/mdu-reduce.js
